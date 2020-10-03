@@ -1,40 +1,50 @@
 <?php
- session_start();
-//Database Configuration File
-include('config.php');
-error_reporting(0);
-if(isset($_POST['login']))
-  {
- 
-    // Getting username and password
-    $email=$_POST['email'];
-    $password=$_POST['pass'];
-    // Fetch data from database on the basis of username/email and password
-    $sql ="SELECT cust_email,cust_password FROM tblcustomer WHERE (cust_email=:email)";
-    $query= $dbh -> prepare($sql);
-    $query-> bindParam(':email', $email, PDO::PARAM_STR);
-    $query-> execute();
-    $results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
-{
-foreach ($results as $row) {
-$hashpass=$row->cust_password;
+include 'config.php';
+session_start();
+$wrongemail="";
+$wrongpassword="";
+
+// used if already login
+if(isset($_SESSION["userlogin"]))
+	header("Location: index.php");
+
+	// used if post request actually sent or initial page relaoding
+if(isset($_POST["email"])){
+
+	$email=$_POST["email"];
+	$password=$_POST["password"];
+	
+	$sql="SELECT * FROM `data` WHERE `email` LIKE '$email'";
+
+	$row=mysqli_query($conn,$sql) or die(mysqli_error());
+	
+			while($r=mysqli_fetch_assoc($row)){
+				if($r["password"]==$password)
+				{
+					$_SESSION["userlogin"]=$email;
+		
+					if($r["category"]=="admin")
+						header("Location: admin.php");
+					else
+						header("Location :index.php");
+		
+				}
+				else
+					$wrongpassword="You entered wrong password.";
+
+			}
+
+		if(mysqli_num_rows($row)==0)
+			$wrongemail="User not registered with us.";
+
+	
+
+	
+
+
 }
-//verifying Password
-if (password_verify($password, $hashpass)) {
-$_SESSION['userlogin']=$_POST['email'];
-    echo "<script type='text/javascript'> document.location = 'index.html'; </script>";
-  } else {
-$wrongpassword="You entered wrong password.";
- 
-  }
-}
-//if username or email not found in database
-else{
-$wrongemail="User not registered with us.";
-  }
- 
-}
+
+
 ?>
 
 
@@ -90,7 +100,7 @@ $wrongemail="User not registered with us.";
           <?php endif;?>
 				
 			
-			<form class="login100-form validate-form" method="post">
+			<form class="login100-form validate-form" method="post" action="login.php">
 					<span class="login100-form-title p-b-49">
 						Login
 					</span>
@@ -103,7 +113,7 @@ $wrongemail="User not registered with us.";
 
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
 						<span class="label-input100">Password</span>
-						<input class="input100" type="password" name="pass" placeholder="Type your password">
+						<input class="input100" type="password" name="password" placeholder="Type your password">
 						<span class="focus-input100" data-symbol="&#xf190;"></span>
 					</div>
 					

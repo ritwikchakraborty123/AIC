@@ -1,16 +1,18 @@
-<?php 
-// DB credentials.
-define('DB_HOST','localhost');
-define('DB_USER','root');
-define('DB_PASS','12345');
-define('DB_NAME','dbfood');
-// Establish database connection.
-try
-{
-$dbh = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME,DB_USER, DB_PASS);
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "aic";
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
+// Check connection
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
 }
-catch (PDOException $e)
-{
-exit("Error: " . $e->getMessage());
-}
+//echo "Connected successfully";
 ?>
+
+
+
